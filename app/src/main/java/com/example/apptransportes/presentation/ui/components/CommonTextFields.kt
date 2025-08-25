@@ -22,14 +22,16 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CommonOutlinedTextField(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.fillMaxWidth(),
     value: String = "",
     onValueChange: (String) -> Unit,
+    readOnly: Boolean = false,
     label: String = "",
     placeholder: String = "",
     errorMessage: String = "",
     isPassword: Boolean = false,
     icon: ImageVector? = null,
+    preIcon: ImageVector? = null,
     onIconClick: () -> Unit = {},
     isPasswordHide: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text
@@ -38,11 +40,12 @@ fun CommonOutlinedTextField(
     val isError = errorMessage.isNotEmpty()
 
     OutlinedTextField(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         value = value,
         onValueChange = onValueChange,
         label = { Text(text = label) },
         placeholder = { Text(text = placeholder) },
+        readOnly = readOnly,
         singleLine = true,
         isError = isError,
         supportingText = if (isError) {
@@ -66,8 +69,13 @@ fun CommonOutlinedTextField(
                 Icon(imageVector = icon!!, contentDescription = null)
             }
         },
+        leadingIcon = if (readOnly) {
+            { Icon(imageVector = preIcon!!, contentDescription = null) }
+        }else{
+            null
+        },
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        visualTransformation = if(isPassword && isPasswordHide) PasswordVisualTransformation() else VisualTransformation.None,
+        visualTransformation = if (isPassword && isPasswordHide) PasswordVisualTransformation() else VisualTransformation.None,
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,

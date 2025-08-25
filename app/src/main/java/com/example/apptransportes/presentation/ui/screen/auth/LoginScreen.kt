@@ -33,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.apptransportes.BuildConfig
 import com.example.apptransportes.R
+import com.example.apptransportes.presentation.ui.components.CommonButtons
 import com.example.apptransportes.presentation.ui.components.CommonOutlinedTextField
 
 @Composable
@@ -71,7 +72,7 @@ fun LoginScreen(padding: PaddingValues,viewModel: LoginViewModel = hiltViewModel
 }
 
 @Composable
-fun Header() {
+private fun Header() {
     Image(
         painter = painterResource(R.drawable.logo_app),
         contentDescription = "Logo Principal de Empresa",
@@ -93,7 +94,7 @@ fun Header() {
 }
 
 @Composable
-fun Body(
+private fun Body(
     modifier: Modifier,
     dni: String,
     password: String,
@@ -149,26 +150,16 @@ fun Body(
         Spacer(modifier = Modifier.size(24.dp))
 
         // Botón principal
-        Button(
-            onClick = { onLogginPressed() },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            enabled = isEnabled,
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator()
-            } else {
-
-                Text(text = "Ingresar", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }
-        }
+        CommonButtons(
+            title = "Ingresar",
+            isEnabled = isEnabled,
+            isLoading = isLoading
+        ) { onLogginPressed() }
     }
 }
 
 @Composable
-fun Footer() {
+private fun Footer() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
