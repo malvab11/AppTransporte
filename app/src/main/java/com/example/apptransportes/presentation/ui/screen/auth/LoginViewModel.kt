@@ -2,18 +2,27 @@ package com.example.apptransportes.presentation.ui.screen.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.apptransportes.domain.usecase.LoginUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor() : ViewModel() {
+class LoginViewModel @Inject constructor(
+    private val loginUserUseCase: LoginUserUseCase
+) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+
+    private val _uiEvents = MutableSharedFlow<LoginEvent>()
+    val uiEvents: SharedFlow<LoginEvent> = _uiEvents.asSharedFlow()
 
     fun onUserChange(dni: String) {
         _uiState.update {
@@ -33,42 +42,41 @@ class LoginViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun onIconPressed(){
+    fun onIconPressed() {
         _uiState.update {
             it.copy(isPasswordHide = !it.isPasswordHide)
         }
     }
 
-
     fun onLogginPressed() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            try {
-                val currentState = _uiState.value
+            val currentState = _uiState.value
+            val response =
+                loginUserUseCase(dni = currentState.dni, password = currentState.password)
 
-                if (currentState.dni == "admin" && currentState.password == "123456") {
-                    // ✅ Login correcto
+            response.fold(
+                onSuccess = { user ->
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "Logueado con exito",
-                            isLoggedIn = true // 👈 agrega esta flag en tu LoginUiState
+                            errorMessage = null,
                         )
                     }
-                } else {
-                    // ❌ Error de credenciales
-                    throw Exception("Usuario o contraseña incorrectos")
+                    _uiEvents.emit(LoginEvent.Success("Bienvenido ${user.nombres}"))
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message,
+                        )
+                    }
+                    _uiEvents.emit(LoginEvent.Error)
+
                 }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "Error desconocido",
-                        isLoggedIn = false
-                    )
-                }
-            }
+            )
         }
     }
 

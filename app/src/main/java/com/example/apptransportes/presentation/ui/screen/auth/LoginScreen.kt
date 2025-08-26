@@ -1,5 +1,6 @@
 package com.example.apptransportes.presentation.ui.screen.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,14 +20,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,11 +39,26 @@ import com.example.apptransportes.BuildConfig
 import com.example.apptransportes.R
 import com.example.apptransportes.presentation.ui.components.CommonButtons
 import com.example.apptransportes.presentation.ui.components.CommonOutlinedTextField
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(padding: PaddingValues,viewModel: LoginViewModel = hiltViewModel(), onLogginSucces: () -> Unit) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEvents.collectLatest{ event ->
+            when(event){
+                is LoginEvent.Success -> {
+                    Toast.makeText(context,event.message,Toast.LENGTH_LONG).show()
+                    onLogginSucces()
+                }
+                is LoginEvent.Error -> {}
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -64,7 +83,9 @@ fun LoginScreen(padding: PaddingValues,viewModel: LoginViewModel = hiltViewModel
             onDniChange = { viewModel.onUserChange(it) },
             onPasswordChange = { viewModel.onPasswordChange(it) },
             onIconClick = { viewModel.onIconPressed() },
-            onLogginPressed = { viewModel.onLogginPressed() }
+            onLogginPressed = {
+                viewModel.onLogginPressed()
+            }
         )
         Footer()
         Spacer(Modifier.size(16.dp))

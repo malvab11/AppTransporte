@@ -6,6 +6,7 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -54,6 +55,15 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    //Analytics
+    implementation("com.google.firebase:firebase-analytics")
+    //Auth
+    implementation("com.google.firebase:firebase-auth")
+    //FireStore
+    implementation("com.google.firebase:firebase-firestore")
 
     //Retrofit
     implementation(libs.retrofit)

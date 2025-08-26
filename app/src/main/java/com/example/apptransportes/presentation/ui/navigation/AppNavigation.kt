@@ -16,7 +16,7 @@ fun AppNavigation(padding: PaddingValues) {
 
     NavHost(
         navController = navigationController,
-        startDestination = Routes.RegisterScreen.route
+        startDestination = Routes.LoginScreen.route
     ) {
         composable(Routes.LoginScreen.route) {
             LoginScreen(padding = padding) {
