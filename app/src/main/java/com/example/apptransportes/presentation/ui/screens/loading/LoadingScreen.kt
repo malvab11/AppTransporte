@@ -1,4 +1,4 @@
-package com.example.apptransportes.presentation.ui.screen.loading
+package com.example.apptransportes.presentation.ui.screens.loading
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

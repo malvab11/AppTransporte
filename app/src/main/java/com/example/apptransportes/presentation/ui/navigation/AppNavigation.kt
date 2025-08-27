@@ -5,10 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.apptransportes.presentation.ui.screen.auth.LoginScreen
-import com.example.apptransportes.presentation.ui.screen.home.HomeScreen
-import com.example.apptransportes.presentation.ui.screen.loading.LoadingScreen
-import com.example.apptransportes.presentation.ui.screen.register.RegisterScreen
+import com.example.apptransportes.presentation.ui.screens.auth.LoginScreen
+import com.example.apptransportes.presentation.ui.screens.home.HomeScreen
+import com.example.apptransportes.presentation.ui.screens.loading.LoadingScreen
+import com.example.apptransportes.presentation.ui.screens.register.RegisterScreen
 
 @Composable
 fun AppNavigation(padding: PaddingValues) {
@@ -16,7 +16,7 @@ fun AppNavigation(padding: PaddingValues) {
 
     NavHost(
         navController = navigationController,
-        startDestination = Routes.LoginScreen.route
+        startDestination = Routes.HomeScreen.route
     ) {
         composable(Routes.LoginScreen.route) {
             LoginScreen(padding = padding) {

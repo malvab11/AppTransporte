@@ -1,8 +1,8 @@
-package com.example.apptransportes.presentation.ui.screen.auth
+package com.example.apptransportes.presentation.ui.screens.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.apptransportes.domain.usecase.LoginUserUseCase
+import com.example.apptransportes.domain.usecase.auth.LoginUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

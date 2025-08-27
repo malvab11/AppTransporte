@@ -1,6 +1,6 @@
 package com.example.apptransportes.data.repository
 
-import com.example.apptransportes.data.datasources.auth.AuthDataSource
+import com.example.apptransportes.data.datasources.AuthDataSource
 import com.example.apptransportes.data.mappers.toEntity
 import com.example.apptransportes.domain.entity.UserEntity
 import com.example.apptransportes.domain.repository.AuthRepository

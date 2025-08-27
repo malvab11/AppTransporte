@@ -1,7 +1,9 @@
 package com.example.apptransportes.di.datasources
 
-import com.example.apptransportes.data.datasources.auth.AuthDataSource
-import com.example.apptransportes.data.datasources.auth.AuthDataSourceImpl
+import com.example.apptransportes.data.datasources.AuthDataSource
+import com.example.apptransportes.data.remote.firebase.AuthDataSourceImpl
+import com.example.apptransportes.data.datasources.MainDataSource
+import com.example.apptransportes.data.remote.firebase.MainDataSourceImpl
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -15,7 +17,13 @@ object DataSourcesModule {
 
     @Provides
     @Singleton
-    fun providesAuthDataSource(firebaseFirestore: FirebaseFirestore): AuthDataSource{
-        return AuthDataSourceImpl(fireStore = firebaseFirestore)
+    fun providesAuthDataSource(firebaseFirestore: FirebaseFirestore): AuthDataSource {
+        return AuthDataSourceImpl(firebaseFirestore = firebaseFirestore)
+    }
+
+    @Provides
+    @Singleton
+    fun providesMainDataSource(firebaseFirestore: FirebaseFirestore): MainDataSource {
+        return MainDataSourceImpl(firebaseFirestore = firebaseFirestore)
     }
 }

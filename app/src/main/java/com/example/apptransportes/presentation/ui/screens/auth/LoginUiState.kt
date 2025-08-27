@@ -1,4 +1,4 @@
-package com.example.apptransportes.presentation.ui.screen.auth
+package com.example.apptransportes.presentation.ui.screens.auth
 
 data class LoginUiState(
     val dni: String = "",

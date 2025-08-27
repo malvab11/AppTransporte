@@ -1,4 +1,4 @@
-package com.example.apptransportes.presentation.ui.screen.register
+package com.example.apptransportes.presentation.ui.screens.register
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.apptransportes.presentation.ui.components.CommonOutlinedTextField
@@ -71,14 +70,14 @@ private fun Inputs(modifier: Modifier = Modifier) {
     var useSystemTime by remember { mutableStateOf(false) }
 
     Column(modifier = modifier) {
-        CommonOutlinedTextField(
-            readOnly = true,
-            label = "Tipo de Registro",
-            value = "",
-            onValueChange = {},
-            icon = Icons.Default.ArrowDropDown,
-            preIcon = Icons.Default.AppRegistration
-        )
+//        CommonOutlinedTextField(
+//            readOnly = true,
+//            label = "Tipo de Registro",
+//            value = "",
+//            onValueChange = {},
+//            icon = Icons.Default.ArrowDropDown,
+//            preIcon = Icons.Default.AppRegistration
+//        )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             CommonOutlinedTextField(
