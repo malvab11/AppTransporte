@@ -26,7 +26,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 @Composable
-fun LoadingScreen(modifier: Modifier = Modifier, padding: PaddingValues, onSuccess: () -> Unit) {
+fun LoadingScreen(modifier: Modifier = Modifier, onSuccess: () -> Unit) {
 
     LaunchedEffect(true) {
         delay(5000)
@@ -36,7 +36,6 @@ fun LoadingScreen(modifier: Modifier = Modifier, padding: PaddingValues, onSucce
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues = padding)
             .background(Color(0xFFF5F5F5)),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally

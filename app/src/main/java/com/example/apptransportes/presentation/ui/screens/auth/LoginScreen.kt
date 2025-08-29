@@ -37,7 +37,7 @@ import com.example.apptransportes.presentation.ui.components.CommonOutlinedTextF
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun LoginScreen(padding: PaddingValues,viewModel: LoginViewModel = hiltViewModel(), onLogginSucces: () -> Unit) {
+fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onLogginSucces: () -> Unit) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -57,7 +57,6 @@ fun LoginScreen(padding: PaddingValues,viewModel: LoginViewModel = hiltViewModel
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues = padding)
             .background(Color(0xFFF5F5F5)),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally

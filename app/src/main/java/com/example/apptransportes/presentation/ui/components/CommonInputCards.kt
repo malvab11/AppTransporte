@@ -19,11 +19,13 @@ fun CommonInputCards(
     modifier: Modifier = Modifier,
     preIcon: ImageVector,
     value: String,
+    enabled: Boolean = true,
     icon: ImageVector,
     onClick: () -> Unit
 ) {
     OutlinedCard(
         modifier = modifier.fillMaxWidth(),
+        enabled = enabled,
         onClick = onClick,
         colors = CardDefaults.outlinedCardColors(containerColor = Color.White)
     ) {

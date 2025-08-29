@@ -1,13 +1,33 @@
 package com.example.apptransportes.presentation.ui.screens.register
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,51 +39,33 @@ import com.example.apptransportes.presentation.ui.theme.RedPastel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(padding: PaddingValues, modifier: Modifier = Modifier) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Registro de Personal", fontWeight = FontWeight.Bold) },
-                actions = { Icon(Icons.Default.Search, contentDescription = "") }
-            )
-        },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { /* acción de sincronizar */ },
-                containerColor = RedPastel,
-                contentColor = Color.White,
-                text = { Text("Sincronizar") },
-                icon = { Icon(Icons.Default.Sync, contentDescription = null) }
-            )
-        },
-        floatingActionButtonPosition = FabPosition.Center
-    ) { innerPadding ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color(0xFFF5F5F5))
-        ) {
-            Inputs(Modifier.padding(horizontal = 20.dp))
+fun RegisterScreen(modifier: Modifier = Modifier) {
 
-            SummaryBar(total = 15)
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+    ) {
+        Inputs(Modifier.padding(horizontal = 20.dp))
 
-            Spacer(Modifier.height(10.dp))
+        SummaryBar(total = 15)
 
-            Registers(
-                modifier = Modifier.padding(horizontal = 20.dp),
-                registros = List(15) {
-                    RegistroUi(
-                        dni = "7427853$it",
-                        nombre = "Colaborador $it",
-                        tipo = if (it % 2 == 0) "Recojo" else "Entrega",
-                        sincronizado = it % 3 != 0
-                    )
-                }
-            )
-        }
+        Spacer(Modifier.height(10.dp))
+
+        Registers(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            registros = List(15) {
+                RegistroUi(
+                    dni = "7427853$it",
+                    nombre = "Colaborador $it",
+                    tipo = if (it % 2 == 0) "Recojo" else "Entrega",
+                    sincronizado = it % 3 != 0
+                )
+            }
+        )
     }
 }
+
 
 @Composable
 private fun Inputs(modifier: Modifier = Modifier) {

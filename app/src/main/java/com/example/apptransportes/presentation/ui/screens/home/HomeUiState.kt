@@ -15,4 +15,11 @@ data class HomeUiState(
     val isEnabled: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+
+    //Valores de Alert Dialog
+    val activeDialog:HomeDialogType = HomeDialogType.NONE
 )
+
+enum class HomeDialogType {
+    NONE, EMPRESAS, RUTAS
+}

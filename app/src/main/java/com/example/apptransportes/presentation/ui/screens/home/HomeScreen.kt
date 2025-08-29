@@ -3,9 +3,9 @@ package com.example.apptransportes.presentation.ui.screens.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -23,15 +23,12 @@ import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -44,19 +41,21 @@ import com.example.apptransportes.presentation.ui.components.CommonInputCards
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    padding: PaddingValues,
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
-    val openAlertDialog = remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Configuración Inicial") }) }
-    ) { innerPadding ->
-        if (openAlertDialog.value) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        if (uiState.activeDialog != HomeDialogType.NONE) {
             AlertDialog(
-                onDismissRequest = { openAlertDialog.value = false },
+                onDismissRequest = { homeViewModel.dismissDialog() },
                 properties = DialogProperties(
                     dismissOnBackPress = true,
                     dismissOnClickOutside = true
@@ -66,34 +65,37 @@ fun HomeScreen(
                     modifier = Modifier
                         .wrapContentWidth()
                         .wrapContentHeight(),
-                    shape = MaterialTheme.shapes.extraLarge, // más redondeado
+                    shape = MaterialTheme.shapes.extraLarge,
                     tonalElevation = AlertDialogDefaults.TonalElevation
                 ) {
                     Column(
                         modifier = Modifier
                             .padding(20.dp)
                     ) {
-                        // Título
                         Text(
-                            text = "Selecciona una Empresa",
+                            text = when (uiState.activeDialog) {
+                                HomeDialogType.EMPRESAS -> "Selecciona una Empresa"
+                                HomeDialogType.RUTAS -> "Seleccione una Ruta"
+                                else -> ""
+                            },
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
-
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Lista de empresas
-                        if (uiState.listEmpresas.isEmpty()) {
+                        if (uiState.isLoading) {
                             Column(
                                 modifier = Modifier
-                                    .fillMaxSize()
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
                                     .padding(20.dp),
-                                verticalArrangement = Arrangement.Center
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 CircularProgressIndicator()
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    "Cargando empresas...",
+                                    "Cargando datos...",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
@@ -101,28 +103,76 @@ fun HomeScreen(
                             LazyColumn(
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 modifier = Modifier
-                                    .heightIn(max = 250.dp) // limitar altura
+                                    .heightIn(max = 250.dp)
                                     .padding(vertical = 8.dp)
                             ) {
-                                items(uiState.listEmpresas) { empresa ->
-                                    Surface(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(horizontal = 4.dp)
-                                            .background(Color.Transparent),
-                                        shape = MaterialTheme.shapes.medium,
-                                        tonalElevation = 1.dp,
-                                        onClick = {
-                                            // Acción al seleccionar empresa
-                                            homeViewModel.onCompanySelected(empresa)
-                                            openAlertDialog.value = false
+                                when (uiState.activeDialog) {
+                                    HomeDialogType.NONE -> {}
+
+                                    HomeDialogType.EMPRESAS -> {
+                                        if (uiState.listEmpresas.isEmpty()) {
+                                            item {
+                                                Text(
+                                                    text = uiState.errorMessage ?: "Error",
+                                                    modifier = Modifier.padding(12.dp),
+                                                    style = MaterialTheme.typography.bodyLarge
+                                                )
+                                            }
+                                        } else {
+                                            items(uiState.listEmpresas) { empresa ->
+                                                Surface(
+                                                    modifier = Modifier
+                                                        .fillMaxSize()
+                                                        .padding(horizontal = 4.dp)
+                                                        .background(Color.Transparent),
+                                                    shape = MaterialTheme.shapes.medium,
+                                                    tonalElevation = 1.dp,
+                                                    onClick = {
+                                                        homeViewModel.onCompanySelected(empresa)
+                                                        homeViewModel.dismissDialog()
+                                                    }
+                                                ) {
+                                                    Text(
+                                                        text = empresa.nombre,
+                                                        modifier = Modifier.padding(12.dp),
+                                                        style = MaterialTheme.typography.bodyLarge
+                                                    )
+                                                }
+                                            }
                                         }
-                                    ) {
-                                        Text(
-                                            text = empresa.nombre,
-                                            modifier = Modifier.padding(12.dp),
-                                            style = MaterialTheme.typography.bodyLarge
-                                        )
+                                    }
+
+                                    HomeDialogType.RUTAS -> {
+                                        if (uiState.listRutas.isEmpty()) {
+                                            item {
+                                                Text(
+                                                    text = uiState.errorMessage ?: "Error",
+                                                    modifier = Modifier.padding(12.dp),
+                                                    style = MaterialTheme.typography.bodyLarge
+                                                )
+                                            }
+                                        } else {
+                                            items(uiState.listRutas) { ruta ->
+                                                Surface(
+                                                    modifier = Modifier
+                                                        .fillMaxSize()
+                                                        .padding(horizontal = 4.dp)
+                                                        .background(Color.Transparent),
+                                                    shape = MaterialTheme.shapes.medium,
+                                                    tonalElevation = 1.dp,
+                                                    onClick = {
+                                                        homeViewModel.onRouteSelected(ruta)
+                                                        homeViewModel.dismissDialog()
+                                                    }
+                                                ) {
+                                                    Text(
+                                                        text = ruta.nombre,
+                                                        modifier = Modifier.padding(12.dp),
+                                                        style = MaterialTheme.typography.bodyLarge
+                                                    )
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -130,61 +180,61 @@ fun HomeScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Botón de cerrar
                         CommonButtons(
                             title = "Cerrar",
                             isEnabled = true,
                             isLoading = false,
-                            onClick = { openAlertDialog.value = false }
+                            onClick = { homeViewModel.dismissDialog() }
                         )
                     }
                 }
             }
         }
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color(0xFFF5F5F5))
-                .padding(horizontal = 20.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Inputs(
-                onCompanyClick = {
-                    openAlertDialog.value = true
-                    homeViewModel.getCompanies()
-                },
-                onRouteClick = {
-                    openAlertDialog.value = true
-                    homeViewModel.getRoutesByCompany()
-                },
-            )
-            Footer(isEnabled = uiState.isEnabled)
-        }
+        Inputs(
+            empresa = uiState.empresa?.nombre,
+            ruta = uiState.ruta?.nombre,
+            onCompanyClick = {
+                homeViewModel.showDialog(type = HomeDialogType.EMPRESAS)
+            },
+            onRouteClick = {
+                homeViewModel.showDialog(type = HomeDialogType.RUTAS)
+            },
+        )
+        Footer(isEnabled = uiState.isEnabled)
     }
 }
 
+
 data class InputField(
     val value: String,
+    val enabled: Boolean,
     val preIcon: ImageVector,
     val onClick: () -> Unit
 )
 
 @Composable
-private fun Inputs(onCompanyClick: () -> Unit, onRouteClick: () -> Unit) {
+private fun Inputs(
+    empresa: String?,
+    ruta: String?,
+    onCompanyClick: () -> Unit,
+    onRouteClick: () -> Unit
+) {
     val fields = listOf(
         InputField(
             value = "Fecha",
+            enabled = true,
             preIcon = Icons.Default.CalendarToday,
             onClick = {}
         ),
         InputField(
-            value = "Empresa",
+            value = empresa ?: "Empresa",
+            enabled = true,
             preIcon = Icons.Default.Business,
             onClick = onCompanyClick
         ),
         InputField(
-            value = "Ruta",
+            value = ruta ?: "Ruta",
+            enabled = !empresa.isNullOrEmpty(),
             preIcon = Icons.Default.LocationOn,
             onClick = onRouteClick
         )
@@ -195,6 +245,7 @@ private fun Inputs(onCompanyClick: () -> Unit, onRouteClick: () -> Unit) {
             CommonInputCards(
                 preIcon = field.preIcon,
                 value = field.value,
+                enabled = field.enabled,
                 icon = Icons.Default.ArrowDropDown,
                 onClick = field.onClick
             )

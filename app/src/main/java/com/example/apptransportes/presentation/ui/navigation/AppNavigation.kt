@@ -1,42 +1,198 @@
 package com.example.apptransportes.presentation.ui.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AppRegistration
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.apptransportes.presentation.ui.screens.auth.LoginScreen
 import com.example.apptransportes.presentation.ui.screens.home.HomeScreen
 import com.example.apptransportes.presentation.ui.screens.loading.LoadingScreen
 import com.example.apptransportes.presentation.ui.screens.register.RegisterScreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
-fun AppNavigation(padding: PaddingValues) {
-    val navigationController = rememberNavController()
+fun AppNavigation() {
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentStack = navBackStackEntry?.destination?.route
 
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    val drawerItems = listOf(
+        NavigationDataClass(Routes.HomeScreen.route, Icons.Default.Home, "Configuración"),
+        NavigationDataClass(Routes.RegisterScreen.route, Icons.Default.AppRegistration, "Registros")
+    )
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            AppDrawer(
+                drawerItems = drawerItems,
+                menuState = drawerState,
+                currentStack = currentStack,
+                scope = scope,
+                navController = navController
+            )
+        }
+    ) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                when (currentStack) {
+                    Routes.HomeScreen.route -> AppTopBar(
+                        title = "Configuración Inicial",
+                        onMenuClick = { scope.launch { drawerState.open() } }
+                    )
+
+                    Routes.RegisterScreen.route -> AppTopBar(
+                        title = "Registro de Colaboradores",
+                        onMenuClick = { scope.launch { drawerState.open() } }
+                    )
+                }
+            },
+        ) { innerPadding ->
+            AppNavHost(
+                navController = navController,
+                modifier = Modifier.padding(innerPadding)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AppNavHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     NavHost(
-        navController = navigationController,
+        modifier = modifier,
+        navController = navController,
         startDestination = Routes.HomeScreen.route
     ) {
         composable(Routes.LoginScreen.route) {
-            LoginScreen(padding = padding) {
-                navigationController.navigate("loadingScreen") {
-                    popUpTo("loginScreen") { inclusive = true }
+            LoginScreen {
+                navController.navigate(Routes.LoadingScreen.route) {
+                    popUpTo(Routes.LoginScreen.route) { inclusive = true }
                 }
             }
         }
         composable(Routes.LoadingScreen.route) {
-            LoadingScreen(padding = padding) {
-                navigationController.navigate("homeScreen") {
-                    popUpTo("loadingScreen") { inclusive = true }
+            LoadingScreen {
+                navController.navigate(Routes.HomeScreen.route) {
+                    popUpTo(Routes.LoadingScreen.route) { inclusive = true }
                 }
             }
         }
         composable(Routes.HomeScreen.route) {
-            HomeScreen(padding = padding)
+            HomeScreen()
         }
         composable(Routes.RegisterScreen.route) {
-            RegisterScreen(padding = padding)
+            RegisterScreen()
         }
     }
+}
+
+@Composable
+private fun AppDrawer(
+    drawerItems: List<NavigationDataClass>,
+    menuState: DrawerState,
+    currentStack: String?,
+    scope: CoroutineScope,
+    navController: NavHostController
+) {
+    ModalDrawerSheet {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Menú de Navegación", modifier = Modifier.padding(16.dp))
+                IconButton(onClick = { scope.launch { menuState.close() } }) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "Cerrar menú")
+                }
+            }
+            HorizontalDivider()
+
+            drawerItems.forEach { item ->
+                NavigationDrawerItem(
+                    icon = { Icon(item.icon, contentDescription = item.label) },
+                    label = { Text(item.label) },
+                    selected = currentStack == item.route,
+                    onClick = {
+                        scope.launch { menuState.close() }
+                        if (currentStack != item.route) {
+                            navController.navigate(item.route) {
+                                popUpTo(Routes.HomeScreen.route) { inclusive = false }
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            NavigationDrawerItem(
+                icon = { Icon(Icons.Default.Logout, contentDescription = "Cerrar Sesión") },
+                label = { Text("Cerrar Sesión") },
+                selected = false,
+                onClick = {
+                    scope.launch { menuState.close() }
+                    navController.navigate(Routes.LoginScreen.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AppTopBar(title: String, onMenuClick: () -> Unit) {
+    TopAppBar(
+        title = { Text(text = title) },
+        navigationIcon = {
+            IconButton(onClick = onMenuClick) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Abrir menú"
+                )
+            }
+        }
+    )
 }
