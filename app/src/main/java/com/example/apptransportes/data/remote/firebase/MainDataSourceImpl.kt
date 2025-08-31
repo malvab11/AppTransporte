@@ -1,7 +1,9 @@
 package com.example.apptransportes.data.remote.firebase
 
+import android.util.Log
 import com.example.apptransportes.data.datasources.MainDataSource
 import com.example.apptransportes.data.models.CompaniesModel
+import com.example.apptransportes.data.models.ConfigurationModel
 import com.example.apptransportes.data.models.PointsModel
 import com.example.apptransportes.data.models.RoutesModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -14,7 +16,9 @@ class MainDataSourceImpl @Inject constructor(
     override suspend fun getCompanies(): List<CompaniesModel?> {
         val companiesDocs = firebaseFirestore.collection("companies").get().await()
         if (companiesDocs.isEmpty) return emptyList()
-        val companies = companiesDocs.documents.map { it.toObject(CompaniesModel::class.java)?.copy(empresaId = it.id) }
+        val companies = companiesDocs.documents.map {
+            it.toObject(CompaniesModel::class.java)?.copy(empresaId = it.id)
+        }
         return companies
     }
 
@@ -23,7 +27,8 @@ class MainDataSourceImpl @Inject constructor(
             firebaseFirestore.collection("routes").whereEqualTo("empresaId", companyId).get()
                 .await()
         if (routesDocs.isEmpty) return emptyList()
-        val routes = routesDocs.documents.map { it.toObject(RoutesModel::class.java)?.copy(routeId = it.id) }
+        val routes =
+            routesDocs.documents.map { it.toObject(RoutesModel::class.java)?.copy(routeId = it.id) }
         return routes
     }
 
@@ -31,7 +36,13 @@ class MainDataSourceImpl @Inject constructor(
         val pointsDocs = firebaseFirestore.collection("points").whereEqualTo("empresaId", companyId)
             .whereEqualTo("rutaId", routeId).get().await()
         if (pointsDocs.isEmpty) return emptyList()
-        val points = pointsDocs.documents.map { it.toObject(PointsModel::class.java)?.copy(pointId = it.id)  }
+        val points =
+            pointsDocs.documents.map { it.toObject(PointsModel::class.java)?.copy(pointId = it.id) }
         return points
+    }
+
+    override suspend fun setConfiguration(configuration: ConfigurationModel): String {
+        firebaseFirestore.collection("configurations").add(configuration).await()
+        return "Se registro correctamente la configuración Inicial"
     }
 }

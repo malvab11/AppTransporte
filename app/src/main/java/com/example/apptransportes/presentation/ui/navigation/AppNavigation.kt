@@ -1,18 +1,24 @@
 package com.example.apptransportes.presentation.ui.navigation
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AppRegistration
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MenuOpen
+import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,13 +35,16 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.apptransportes.R
 import com.example.apptransportes.presentation.ui.screens.auth.LoginScreen
 import com.example.apptransportes.presentation.ui.screens.home.HomeScreen
 import com.example.apptransportes.presentation.ui.screens.loading.LoadingScreen
@@ -53,8 +62,9 @@ fun AppNavigation() {
     val scope = rememberCoroutineScope()
 
     val drawerItems = listOf(
-        NavigationDataClass(Routes.HomeScreen.route, Icons.Default.Home, "Configuración"),
-        NavigationDataClass(Routes.RegisterScreen.route, Icons.Default.AppRegistration, "Registros")
+        NavigationDataClass(Routes.HomeScreen.route, Icons.Default.Home, "Configuración Inicial"),
+        NavigationDataClass(Routes.RegisterScreen.route, Icons.Default.AppRegistration, "Registro de Personal"),
+        NavigationDataClass(Routes.RegisterScreen.route, Icons.Default.ReceiptLong, "Reporte de Personal")
     )
 
     ModalNavigationDrawer(
@@ -79,7 +89,7 @@ fun AppNavigation() {
                     )
 
                     Routes.RegisterScreen.route -> AppTopBar(
-                        title = "Registro de Colaboradores",
+                        title = "Registro de Personal",
                         onMenuClick = { scope.launch { drawerState.open() } }
                     )
                 }
@@ -101,7 +111,7 @@ private fun AppNavHost(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = Routes.HomeScreen.route
+        startDestination = Routes.RegisterScreen.route
     ) {
         composable(Routes.LoginScreen.route) {
             LoginScreen {
@@ -138,45 +148,66 @@ private fun AppDrawer(
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Image(
+                    painter = painterResource(R.drawable.logo_app),
+                    contentDescription = "Logo Principal de Empresa",
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .size(70.dp)
+                )
                 Text("Menú de Navegación", modifier = Modifier.padding(16.dp))
                 IconButton(onClick = { scope.launch { menuState.close() } }) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "Cerrar menú")
+                    Icon(imageVector = Icons.Default.MenuOpen, contentDescription = "Cerrar menú")
                 }
             }
-            HorizontalDivider()
+            Column(modifier = Modifier.fillMaxSize()) {
+                Column {
+                    Text("Bienvenid@", modifier = Modifier.padding(horizontal = 16.dp))
+                    Text("Marlon Alva", modifier = Modifier.padding(horizontal = 16.dp))
+                }
+                
+                Spacer(Modifier.height(30.dp))
 
-            drawerItems.forEach { item ->
-                NavigationDrawerItem(
-                    icon = { Icon(item.icon, contentDescription = item.label) },
-                    label = { Text(item.label) },
-                    selected = currentStack == item.route,
-                    onClick = {
-                        scope.launch { menuState.close() }
-                        if (currentStack != item.route) {
-                            navController.navigate(item.route) {
-                                popUpTo(Routes.HomeScreen.route) { inclusive = false }
-                                launchSingleTop = true
+                Column {
+                    drawerItems.forEach { item ->
+                        NavigationDrawerItem(
+                            icon = { Icon(item.icon, contentDescription = item.label) },
+                            label = { Text(item.label) },
+                            selected = currentStack == item.route,
+                            onClick = {
+                                scope.launch { menuState.close() }
+                                if (currentStack != item.route) {
+                                    navController.navigate(item.route) {
+                                        popUpTo(Routes.HomeScreen.route) { inclusive = false }
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+                        )
+                    }
+
+                    NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.PowerSettingsNew, contentDescription = "Cerrar Sesión") },
+                        label = { Text("Cerrar Sesión") },
+                        selected = false,
+                        onClick = {
+                            scope.launch { menuState.close() }
+                            navController.navigate(Routes.LoginScreen.route) {
+                                popUpTo(0) { inclusive = true }
                             }
                         }
-                    }
-                )
+                    )
+                }
+                Spacer(Modifier.weight(1f))
+                Column(Modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Transporte de Personal", modifier = Modifier.padding(horizontal = 16.dp))
+                    Text("Marlon Alva v 1.0.0", modifier = Modifier.padding(horizontal = 16.dp))
+                }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            NavigationDrawerItem(
-                icon = { Icon(Icons.Default.Logout, contentDescription = "Cerrar Sesión") },
-                label = { Text("Cerrar Sesión") },
-                selected = false,
-                onClick = {
-                    scope.launch { menuState.close() }
-                    navController.navigate(Routes.LoginScreen.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-            )
         }
     }
 }

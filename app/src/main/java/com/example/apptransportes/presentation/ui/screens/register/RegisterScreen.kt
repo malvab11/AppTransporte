@@ -12,16 +12,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AppRegistration
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,10 +40,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.apptransportes.presentation.ui.components.CommonInputCards
 import com.example.apptransportes.presentation.ui.components.CommonOutlinedTextField
 import com.example.apptransportes.presentation.ui.theme.RedPastel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(modifier: Modifier = Modifier) {
 
@@ -45,8 +51,9 @@ fun RegisterScreen(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFFF5F5F5))
+            .padding(vertical = 10.dp)
     ) {
-        Inputs(Modifier.padding(horizontal = 20.dp))
+        Configurations(Modifier.padding(horizontal = 20.dp))
 
         SummaryBar(total = 15)
 
@@ -68,18 +75,18 @@ fun RegisterScreen(modifier: Modifier = Modifier) {
 
 
 @Composable
-private fun Inputs(modifier: Modifier = Modifier) {
+private fun Configurations(modifier: Modifier = Modifier) {
     var useSystemTime by remember { mutableStateOf(false) }
 
     Column(modifier = modifier) {
-//        CommonOutlinedTextField(
-//            readOnly = true,
-//            label = "Tipo de Registro",
-//            value = "",
-//            onValueChange = {},
-//            icon = Icons.Default.ArrowDropDown,
-//            preIcon = Icons.Default.AppRegistration
-//        )
+
+        CommonInputCards(
+            preIcon = Icons.Default.AppRegistration,
+            value = "Tipo de Registro",
+            enabled = true,
+            icon = Icons.Default.ArrowDropDown,
+            onClick = {}
+        )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             CommonOutlinedTextField(

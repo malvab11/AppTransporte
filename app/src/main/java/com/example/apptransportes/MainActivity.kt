@@ -10,12 +10,19 @@ import androidx.compose.ui.Modifier
 import com.example.apptransportes.presentation.ui.navigation.AppNavigation
 import com.example.apptransportes.presentation.ui.theme.AppTransportesTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val locale = Locale("es", "PE")
+        Locale.setDefault(locale)
+
+        val config = resources.configuration
+        config.setLocale(locale)
+        createConfigurationContext(config)
         enableEdgeToEdge()
         setContent {
             AppTransportesTheme {

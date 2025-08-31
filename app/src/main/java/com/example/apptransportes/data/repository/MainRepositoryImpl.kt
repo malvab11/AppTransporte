@@ -1,8 +1,10 @@
 package com.example.apptransportes.data.repository
 
 import com.example.apptransportes.data.datasources.MainDataSource
+import com.example.apptransportes.data.mappers.toDomain
 import com.example.apptransportes.data.mappers.toEntity
 import com.example.apptransportes.domain.entity.CompaniesEntity
+import com.example.apptransportes.domain.entity.ConfigurationEntity
 import com.example.apptransportes.domain.entity.PointsEntity
 import com.example.apptransportes.domain.entity.RoutesEntity
 import com.example.apptransportes.domain.repository.MainRepository
@@ -50,6 +52,15 @@ class MainRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             Result.failure<List<PointsEntity>>(e)
+        }
+    }
+
+    override suspend fun setConfiguration(configuration: ConfigurationEntity): Result<String> {
+        return try {
+            val id = mainDataSource.setConfiguration(configuration = configuration.toDomain())
+            Result.success(id)
+        } catch (e: Exception) {
+            Result.failure<String>(e)
         }
     }
 }
