@@ -1,6 +1,5 @@
 package com.example.apptransportes.presentation.ui.screens.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.apptransportes.domain.entity.CompaniesEntity
@@ -32,7 +31,7 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     //Estado Inicial
-    fun clearMessages(){
+    fun clearMessages() {
         _uiState.update {
             it.copy(
                 successMessage = null,
@@ -140,18 +139,18 @@ class HomeViewModel @Inject constructor(
                 empresa = company,
                 ruta = null,
                 listRutas = emptyList(),
-                isEnabled = false
             )
         }
+        isEnabledValidator()
     }
 
     fun onRouteSelected(route: RoutesEntity) {
         _uiState.update {
             it.copy(
                 ruta = route,
-                isEnabled = true
             )
         }
+        isEnabledValidator()
     }
 
     fun onDateSelected(date: Long) {
@@ -160,17 +159,32 @@ class HomeViewModel @Inject constructor(
                 fecha = date,
             )
         }
+        isEnabledValidator()
     }
 
     fun dateText(): String {
-        val dateFormatText =
-            _uiState.value.fecha?.let {
-                Date(
-                    it
-                )
-            }?.let { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) }
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        dateFormat.timeZone = java.util.TimeZone.getTimeZone("UTC")
 
-        return dateFormatText ?: "Fecha"
+        val fechaSeleccionada = _uiState.value.fecha
+        val fechaInicial = fechaSeleccionada ?: System.currentTimeMillis()
+
+        return dateFormat.format(Date(fechaInicial))
+    }
+
+    // ------------------------------
+    // Seteo de Datos
+    // ------------------------------
+
+    private fun isEnabledValidator() {
+        _uiState.update {
+            it.copy(
+                isEnabled =
+                            it.fecha != null &&
+                            it.empresa?.empresaId != null &&
+                            it.ruta?.routeId != null
+            )
+        }
     }
 
     // ------------------------------
@@ -186,11 +200,13 @@ class HomeViewModel @Inject constructor(
                 )
             }
             val currentState = _uiState.value
-            val result = setConfigurationUseCase(configuration = ConfigurationEntity(
-                date = currentState.fecha!!,
-                companyId = currentState.empresa!!.empresaId,
-                routeId = currentState.ruta!!.routeId
-            ))
+            val result = setConfigurationUseCase(
+                configuration = ConfigurationEntity(
+                    date = currentState.fecha!!,
+                    companyId = currentState.empresa!!.empresaId,
+                    routeId = currentState.ruta!!.routeId
+                )
+            )
             result.fold(
                 onSuccess = { setResult ->
                     _uiState.update {

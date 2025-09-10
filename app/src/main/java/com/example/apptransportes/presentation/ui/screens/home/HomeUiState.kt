@@ -6,7 +6,7 @@ import com.example.apptransportes.domain.entity.RoutesEntity
 
 data class HomeUiState(
     //Datos
-    val fecha: Long? = null,
+    val fecha: Long? = System.currentTimeMillis(),
     val listEmpresas: List<CompaniesEntity> = emptyList(),
     val empresa: CompaniesEntity? = null,
     val listRutas: List<RoutesEntity> = emptyList(),

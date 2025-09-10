@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.apptransportes.presentation.ui.components.CommonAlertDialog
 import com.example.apptransportes.presentation.ui.components.CommonButtons
 import com.example.apptransportes.presentation.ui.components.CommonInputCards
 
@@ -68,8 +69,38 @@ fun HomeScreen(
             .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        if (uiState.activeDialog != HomeDialogType.NONE) {
-            MyAlertDiag(uiState = uiState, homeViewModel = homeViewModel)
+        when (uiState.activeDialog) {
+            HomeDialogType.EMPRESAS -> {
+                CommonAlertDialog(
+                    title = "Selecciona una Empresa",
+                    items = uiState.listEmpresas,
+                    isLoading = uiState.isLoading,
+                    errorMessage = uiState.errorMessage,
+                    itemLabel = { it.nombre },
+                    onItemClick = { empresa ->
+                        homeViewModel.onCompanySelected(empresa)
+                        homeViewModel.dismissDialog()
+                    },
+                    onDismiss = { homeViewModel.dismissDialog() }
+                )
+            }
+
+            HomeDialogType.RUTAS -> {
+                CommonAlertDialog(
+                    title = "Selecciona una Ruta",
+                    items = uiState.listRutas,
+                    isLoading = uiState.isLoading,
+                    errorMessage = uiState.errorMessage,
+                    itemLabel = { it.nombre },
+                    onItemClick = { ruta ->
+                        homeViewModel.onRouteSelected(ruta)
+                        homeViewModel.dismissDialog()
+                    },
+                    onDismiss = { homeViewModel.dismissDialog() }
+                )
+            }
+
+            else -> {}
         }
         if (uiState.activeDateDialog) {
             MyDateDialog(uiState = uiState, homeViewModel = homeViewModel)
@@ -117,146 +148,6 @@ private fun MyDateDialog(uiState: HomeUiState, homeViewModel: HomeViewModel) {
         DatePicker(
             state = datePickerState,
             title = { Text(text = "Seleccione una fecha", modifier = Modifier.padding(12.dp)) })
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun MyAlertDiag(uiState: HomeUiState, homeViewModel: HomeViewModel) {
-    AlertDialog(
-        onDismissRequest = { homeViewModel.dismissDialog() },
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        ),
-    ) {
-        Surface(
-            modifier = Modifier
-                .wrapContentWidth()
-                .wrapContentHeight(),
-            shape = MaterialTheme.shapes.extraLarge,
-            tonalElevation = AlertDialogDefaults.TonalElevation
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(20.dp)
-            ) {
-                Text(
-                    text = when (uiState.activeDialog) {
-                        HomeDialogType.EMPRESAS -> "Selecciona una Empresa"
-                        HomeDialogType.RUTAS -> "Seleccione una Ruta"
-                        else -> ""
-                    },
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (uiState.isLoading) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator()
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            "Cargando datos...",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .heightIn(max = 250.dp)
-                            .padding(vertical = 8.dp)
-                    ) {
-                        when (uiState.activeDialog) {
-                            HomeDialogType.NONE -> {}
-
-                            HomeDialogType.EMPRESAS -> {
-                                if (uiState.listEmpresas.isEmpty()) {
-                                    item {
-                                        Text(
-                                            text = uiState.errorMessage ?: "Error",
-                                            modifier = Modifier.padding(12.dp),
-                                            style = MaterialTheme.typography.bodyLarge
-                                        )
-                                    }
-                                } else {
-                                    items(uiState.listEmpresas) { empresa ->
-                                        Surface(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(horizontal = 4.dp)
-                                                .background(Color.Transparent),
-                                            shape = MaterialTheme.shapes.medium,
-                                            tonalElevation = 1.dp,
-                                            onClick = {
-                                                homeViewModel.onCompanySelected(empresa)
-                                                homeViewModel.dismissDialog()
-                                            }
-                                        ) {
-                                            Text(
-                                                text = empresa.nombre,
-                                                modifier = Modifier.padding(12.dp),
-                                                style = MaterialTheme.typography.bodyLarge
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                            HomeDialogType.RUTAS -> {
-                                if (uiState.listRutas.isEmpty()) {
-                                    item {
-                                        Text(
-                                            text = uiState.errorMessage ?: "Error",
-                                            modifier = Modifier.padding(12.dp),
-                                            style = MaterialTheme.typography.bodyLarge
-                                        )
-                                    }
-                                } else {
-                                    items(uiState.listRutas) { ruta ->
-                                        Surface(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(horizontal = 4.dp)
-                                                .background(Color.Transparent),
-                                            shape = MaterialTheme.shapes.medium,
-                                            tonalElevation = 1.dp,
-                                            onClick = {
-                                                homeViewModel.onRouteSelected(ruta)
-                                                homeViewModel.dismissDialog()
-                                            }
-                                        ) {
-                                            Text(
-                                                text = ruta.nombre,
-                                                modifier = Modifier.padding(12.dp),
-                                                style = MaterialTheme.typography.bodyLarge
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                CommonButtons(
-                    title = "Cerrar",
-                    isEnabled = true,
-                    isLoading = false,
-                    onClick = { homeViewModel.dismissDialog() }
-                )
-            }
-        }
     }
 }
 
