@@ -18,4 +18,6 @@ class AuthDataSourceImpl @Inject constructor(
         val user = firebaseFirestore.collection("users").whereEqualTo("dni",dni).get().await().documents.firstOrNull() ?: return null
         return user.toObject(UserModel::class.java)
     }
+
+
 }

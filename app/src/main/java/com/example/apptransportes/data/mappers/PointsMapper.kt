@@ -13,7 +13,7 @@ fun PointsModel.toEntity(): PointsEntity = PointsEntity(
     rutaId = rutaId
 )
 
-fun PointsEntity.toDomain(): PointsModel = PointsModel(
+fun PointsEntity.toModel(): PointsModel = PointsModel(
     pointId = pointId,
     direccion = direccion,
     empresaId = empresaId,

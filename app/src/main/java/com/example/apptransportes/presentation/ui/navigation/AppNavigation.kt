@@ -111,7 +111,7 @@ private fun AppNavHost(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = Routes.RegisterScreen.route
+        startDestination = Routes.HomeScreen.route
     ) {
         composable(Routes.LoginScreen.route) {
             LoginScreen {

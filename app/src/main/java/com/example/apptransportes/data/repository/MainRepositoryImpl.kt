@@ -1,7 +1,7 @@
 package com.example.apptransportes.data.repository
 
 import com.example.apptransportes.data.datasources.MainDataSource
-import com.example.apptransportes.data.mappers.toDomain
+import com.example.apptransportes.data.mappers.toModel
 import com.example.apptransportes.data.mappers.toEntity
 import com.example.apptransportes.domain.entity.CompaniesEntity
 import com.example.apptransportes.domain.entity.ConfigurationEntity
@@ -57,7 +57,7 @@ class MainRepositoryImpl @Inject constructor(
 
     override suspend fun setConfiguration(configuration: ConfigurationEntity): Result<String> {
         return try {
-            val id = mainDataSource.setConfiguration(configuration = configuration.toDomain())
+            val id = mainDataSource.setConfiguration(configuration = configuration.toModel())
             Result.success(id)
         } catch (e: Exception) {
             Result.failure<String>(e)

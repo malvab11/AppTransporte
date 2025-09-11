@@ -10,7 +10,7 @@ fun RoutesModel.toEntity(): RoutesEntity = RoutesEntity(
     nombre = nombre
 )
 
-fun RoutesModel.toDomain(): RoutesModel = RoutesModel(
+fun RoutesModel.toModel(): RoutesModel = RoutesModel(
     routeId = routeId,
     descripcion = descripcion,
     empresaId = empresaId,

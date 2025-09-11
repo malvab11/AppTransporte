@@ -12,10 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AppRegistration
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CameraAlt
@@ -23,13 +21,11 @@ import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,15 +33,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.apptransportes.presentation.ui.components.CommonAlertDialog
 import com.example.apptransportes.presentation.ui.components.CommonInputCards
 import com.example.apptransportes.presentation.ui.components.CommonOutlinedTextField
 import com.example.apptransportes.presentation.ui.theme.RedPastel
 
 @Composable
-fun RegisterScreen(modifier: Modifier = Modifier) {
+fun RegisterScreen(
+    modifier: Modifier = Modifier,
+    registerViewModel: RegisterViewModel = hiltViewModel()
+) {
+
+    val uiState by registerViewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -53,7 +58,34 @@ fun RegisterScreen(modifier: Modifier = Modifier) {
             .background(Color(0xFFF5F5F5))
             .padding(vertical = 10.dp)
     ) {
-        Configurations(Modifier.padding(horizontal = 20.dp))
+
+        if (uiState.activeAlertDialog) {
+            CommonAlertDialog(
+                title = "Seleccione Tipo Registro",
+                items = uiState.registerTypes,
+                isLoading = uiState.isLoading,
+                errorMessage = uiState.errorMessage,
+                itemLabel = { it.type },
+                onItemClick = {
+                    registerViewModel.onTypeSelected(it)
+                    registerViewModel.dismissDialog()
+                },
+                onDismiss = { registerViewModel.dismissDialog() }
+            )
+        }
+
+        Configurations(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            dni = uiState.dni,
+            selectedType = uiState.selectedRegisterType?.type,
+            onTypeConfigurationClick = {
+                registerViewModel.getRegisterTypes()
+                registerViewModel.showDialog()
+            },
+            onDniChange = {
+                registerViewModel.onDniChange(it)
+            }
+        )
 
         SummaryBar(total = 15)
 
@@ -75,24 +107,30 @@ fun RegisterScreen(modifier: Modifier = Modifier) {
 
 
 @Composable
-private fun Configurations(modifier: Modifier = Modifier) {
+private fun Configurations(
+    modifier: Modifier = Modifier,
+    dni: String,
+    selectedType: String?,
+    onTypeConfigurationClick: () -> Unit,
+    onDniChange: (String) -> Unit
+) {
     var useSystemTime by remember { mutableStateOf(false) }
 
     Column(modifier = modifier) {
 
         CommonInputCards(
             preIcon = Icons.Default.AppRegistration,
-            value = "Tipo de Registro",
+            value = selectedType ?: "Tipo de Registro",
             enabled = true,
             icon = Icons.Default.ArrowDropDown,
-            onClick = {}
+            onClick = onTypeConfigurationClick
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             CommonOutlinedTextField(
                 modifier = Modifier.weight(1f),
-                value = "",
-                onValueChange = {},
+                value = dni,
+                onValueChange = { onDniChange(it) },
                 label = "DNI Colaborador",
                 icon = Icons.Default.CreditCard
             )

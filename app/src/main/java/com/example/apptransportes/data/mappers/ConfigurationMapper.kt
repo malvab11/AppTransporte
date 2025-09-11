@@ -9,7 +9,7 @@ fun ConfigurationModel.toEntity(): ConfigurationEntity = ConfigurationEntity(
     routeId = routeId
 )
 
-fun ConfigurationEntity.toDomain(): ConfigurationModel = ConfigurationModel(
+fun ConfigurationEntity.toModel(): ConfigurationModel = ConfigurationModel(
     date = date,
     companyId = companyId,
     routeId = routeId

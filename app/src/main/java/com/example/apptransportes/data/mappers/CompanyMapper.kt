@@ -11,7 +11,7 @@ fun CompaniesModel.toEntity(): CompaniesEntity = CompaniesEntity(
     telefono = telefono
 )
 
-fun CompaniesModel.toDomain(): CompaniesModel = CompaniesModel(
+fun CompaniesModel.toModel(): CompaniesModel = CompaniesModel(
     empresaId = empresaId,
     nombre = nombre,
     email = email,
